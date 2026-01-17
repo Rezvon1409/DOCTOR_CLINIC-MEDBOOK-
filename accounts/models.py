@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String, DateTime, Table, Column, ForeignKey
+from sqlalchemy import Integer, String, DateTime, Table, Column, ForeignKey, false
 from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from server.models import BaseModel
@@ -33,6 +33,8 @@ class User(BaseModel):
     password:Mapped[str] = mapped_column(String, nullable=False)
     bio:Mapped[str] = mapped_column(nullable=True)
     department:Mapped[str] = mapped_column(String, default="sales")
+    is_staff:Mapped[bool] = mapped_column(server_default=false(), nullable=False)
+    is_superuser:Mapped[bool] = mapped_column(server_default=false(), nullable=False)
     
     roles:Mapped[list["Role"]] = relationship("Role", secondary=user_roles, back_populates="users")
     permissions:Mapped[list["Permission"]] = relationship("Permission", secondary=user_permissions, back_populates="users")
