@@ -46,5 +46,27 @@ def required_permission(req_permissions:list):
             detail="Access denied!"
         )
     return has_permission
+
+
+def role_required(req_roles:list):
+    def has_permission(user=Depends(get_current_user)):
+        user_roles = [role.name for role in user.roles]
+        
+        for role in req_roles:
+            if role in user_roles:
+                return True
+
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied!"
+        )
+    return has_permission
+
+
+def is_admin_user(user=Depends(get_current_user)):
+    if user.is_staff==True or user.is_superuser:
+        return True
+    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied!")
+    
             
         
