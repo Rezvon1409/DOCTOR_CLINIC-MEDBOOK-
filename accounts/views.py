@@ -11,34 +11,44 @@ from .permissions import *
 
 auth = APIRouter()
 
+
+
 @auth.post("/register", response_model=UserSchema)
-async def register_api_view(data:RegisterShcema, db:Session=Depends(get_db)):
-    print(data.username)
+async def register_api_view(data: RegisterSchema, db: Session = Depends(get_db)):
     user = get_user(username=data.username, db=db)
     if user is not None:
-        return HTTPException(detail="User already exists!", status_code=status.HTTP_400_BAD_REQUEST)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists!")
+
     password_hash = hash_password(data.password)
     new_user = User(username=data.username, password=password_hash)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
+    patient_role = db.query(Role).filter(Role.name == "patient").first()
+    if patient_role:
+        new_user.roles.append(patient_role)
+        db.commit()
+        db.refresh(new_user)
+
     return new_user
 
 
+
 @auth.post("/add-user", dependencies=[Depends(is_admin_user), Depends(role_required(["admin"]))], response_model=UserSchema)
-async def add_user_api_view(data:AddUserShcema, db:Session=Depends(get_db)):
+async def add_user_api_view(data:AddUserSchema, db:Session=Depends(get_db)):
     q = get_user(username=data.username, db=db)
-    if q is not None:
+    if q is not None:   
         raise HTTPException(detail="User already exists!", status_code=status.HTTP_400_BAD_REQUEST)
     user = create_user(data=data, db=db)
     return user
 
 
 @auth.post("/login")
-async def register_api_view(data:LoginShcema, db:Session=Depends(get_db)):
+async def register_api_view(data:LoginSchema, db:Session=Depends(get_db)):
     user = authenticate(username=data.username, password=data.password, db=db)
     if not user:
-        return HTTPException(detail="Invalid credentials!", status_code=status.HTTP_400_BAD_REQUEST)
+        raise HTTPException(detail="Invalid credentials!", status_code=status.HTTP_400_BAD_REQUEST)
     
     return {
         "refresh":create_refresh_token(user.username, user.id),
@@ -58,7 +68,7 @@ async def logout_api_view(token:str, db:Session=Depends(get_db)):
             "message":"logged out user",
             "status":status.HTTP_200_OK
         }
-    return HTTPException("Invalid or expired token!")
+    raise HTTPException("Invalid or expired token!")
 
 
 
@@ -72,7 +82,7 @@ async def refresh_token(token:str, db:Session=Depends(get_db)):
                 username=is_valid_token["username"],
                 user_id=int(is_valid_token["sub"]))
         }
-    return HTTPException(
+    raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
         detail="Invalid token"
     )
