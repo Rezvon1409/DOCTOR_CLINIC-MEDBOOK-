@@ -3,7 +3,7 @@ from datetime import datetime, date, time
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from server.models import BaseModel
 
-# Many-to-many tables
+
 user_permissions = Table(
     "user_permissions",
     BaseModel.metadata,
@@ -69,25 +69,25 @@ class BlackListTokens(BaseModel):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
 
-# ==================== HOSPITAL SYSTEM MODELS ====================
+
 
 class Hospital(BaseModel):
     __tablename__ = "hospitals"
     
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(200))
-    region: Mapped[str] = mapped_column(String(50))  # Вилоят
+    region: Mapped[str] = mapped_column(String(50))  
     city: Mapped[str] = mapped_column(String(50))
     address: Mapped[str] = mapped_column(String(300))
     phone: Mapped[str] = mapped_column(String(20))
     email: Mapped[str] = mapped_column(String(100), nullable=True)
-    hospital_type: Mapped[str] = mapped_column(String(20), default="public")  # public, private
+    hospital_type: Mapped[str] = mapped_column(String(20), default="public")  
     latitude: Mapped[float] = mapped_column(Float, nullable=True)
     longitude: Mapped[float] = mapped_column(Float, nullable=True)
     is_active: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     
-    # Relationships
+    
     doctors: Mapped[list["Doctor"]] = relationship(back_populates="hospital", cascade="all, delete-orphan")
     departments: Mapped[list["Department"]] = relationship(back_populates="hospital", cascade="all, delete-orphan")
     appointments: Mapped[list["Appointment"]] = relationship(back_populates="hospital", cascade="all, delete-orphan")
@@ -102,7 +102,7 @@ class Department(BaseModel):
     hospital_id: Mapped[int] = mapped_column(ForeignKey("hospitals.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     
-    # Relationships
+    
     hospital: Mapped["Hospital"] = relationship(back_populates="departments")
     doctors: Mapped[list["Doctor"]] = relationship(back_populates="department", cascade="all, delete-orphan")
 
@@ -116,7 +116,7 @@ class Patient(BaseModel):
     last_name: Mapped[str] = mapped_column(String(50))
     middle_name: Mapped[str] = mapped_column(String(50), nullable=True)
     birth_date: Mapped[date] = mapped_column(Date)
-    gender: Mapped[str] = mapped_column(String(10))  # male, female
+    gender: Mapped[str] = mapped_column(String(10))  
     passport_number: Mapped[str] = mapped_column(String(20), unique=True)
     phone: Mapped[str] = mapped_column(String(20))
     address: Mapped[str] = mapped_column(String(300))
@@ -128,7 +128,7 @@ class Patient(BaseModel):
     emergency_phone: Mapped[str] = mapped_column(String(20))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     
-    # Relationships
+    
     user: Mapped["User"] = relationship("User")
     appointments: Mapped[list["Appointment"]] = relationship(back_populates="patient", cascade="all, delete-orphan")
     medical_records: Mapped[list["MedicalRecord"]] = relationship(back_populates="patient", cascade="all, delete-orphan")
@@ -138,10 +138,10 @@ class Patient(BaseModel):
 class Doctor(BaseModel):
     __tablename__ = "doctors"
     
-    # ID-и мустақил бо autoincrement
+    
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     
-    # пайвастшавӣ бо User (ихтиёрӣ)
+    
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
 
     first_name: Mapped[str] = mapped_column(String(50))
@@ -150,7 +150,7 @@ class Doctor(BaseModel):
     birth_date: Mapped[date] = mapped_column(Date)
     specialization: Mapped[str] = mapped_column(String(100))
     license_number: Mapped[str] = mapped_column(String(50), unique=True)
-    qualification: Mapped[str] = mapped_column(String(100))  # категория
+    qualification: Mapped[str] = mapped_column(String(100))  
     experience_years: Mapped[int] = mapped_column(Integer)
     phone: Mapped[str] = mapped_column(String(20))
     email: Mapped[str] = mapped_column(String(100))
@@ -161,7 +161,7 @@ class Doctor(BaseModel):
     is_available: Mapped[bool] = mapped_column(Boolean, default=True)
     consultation_fee: Mapped[float] = mapped_column(Float, nullable=True)
     
-    # Relationships
+   
     user: Mapped["User"] = relationship("User")
     hospital: Mapped["Hospital"] = relationship(back_populates="doctors")
     department: Mapped["Department"] = relationship(back_populates="doctors")
@@ -183,10 +183,10 @@ class DoctorSchedule(BaseModel):
     
     id: Mapped[int] = mapped_column(primary_key=True)
     doctor_id: Mapped[int] = mapped_column(ForeignKey("doctors.id"))
-    day_of_week: Mapped[int] = mapped_column(Integer)  # 0-6 (Monday=0, Sunday=6)
+    day_of_week: Mapped[int] = mapped_column(Integer) 
     start_time: Mapped[time] = mapped_column(Time)
     end_time: Mapped[time] = mapped_column(Time)
-    slot_duration: Mapped[int] = mapped_column(Integer, default=30)  # minutes
+    slot_duration: Mapped[int] = mapped_column(Integer, default=30)  
     is_active: Mapped[bool] = mapped_column(default=True)
     
     doctor: Mapped["Doctor"] = relationship(back_populates="working_hours")
@@ -202,12 +202,12 @@ class Appointment(BaseModel):
     
     appointment_date: Mapped[date] = mapped_column(Date)
     appointment_time: Mapped[time] = mapped_column(Time)
-    status: Mapped[str] = mapped_column(String(20), default="scheduled")  # scheduled, completed, cancelled
+    status: Mapped[str] = mapped_column(String(20), default="scheduled")  
     symptoms: Mapped[str] = mapped_column(Text, nullable=True)
     notes: Mapped[str] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     
-    # Relationships
+   
     patient: Mapped["Patient"] = relationship(back_populates="appointments")
     doctor: Mapped["Doctor"] = relationship(back_populates="appointments")
     hospital: Mapped["Hospital"] = relationship(back_populates="appointments")
@@ -229,7 +229,7 @@ class MedicalRecord(BaseModel):
     next_visit_date: Mapped[date] = mapped_column(Date, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     
-    # Relationships
+    
     appointment: Mapped["Appointment"] = relationship(back_populates="medical_record")
     patient: Mapped["Patient"] = relationship(back_populates="medical_records")
     doctor: Mapped["Doctor"] = relationship(back_populates="medical_records")
@@ -242,12 +242,12 @@ class Prescription(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     medical_record_id: Mapped[int] = mapped_column(ForeignKey("medical_records.id"))
     medicine_name: Mapped[str] = mapped_column(String(200))
-    dosage: Mapped[str] = mapped_column(String(100))  # 500мг
-    frequency: Mapped[str] = mapped_column(String(100))  # 3 маротиба дар як рӯз
-    duration: Mapped[str] = mapped_column(String(100))  # 7 рӯз
+    dosage: Mapped[str] = mapped_column(String(100))  
+    frequency: Mapped[str] = mapped_column(String(100))  
+    duration: Mapped[str] = mapped_column(String(100)) 
     instructions: Mapped[str] = mapped_column(Text, nullable=True)
     prescribed_date: Mapped[date] = mapped_column(Date, default=date.today)
     
-    # Relationships
+    
     medical_record: Mapped["MedicalRecord"] = relationship(back_populates="prescriptions")
               

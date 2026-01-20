@@ -4,7 +4,7 @@ from datetime import date, datetime
 from typing import Optional, List
 
 
-class RegisterSchema(BaseModel):  # ✅ Ислоҳ: "Schema" ба ҷои "Shcema"
+class RegisterSchema(BaseModel): 
     username: str
     password: str
     confirm_password: str
@@ -26,7 +26,7 @@ class RegisterSchema(BaseModel):  # ✅ Ислоҳ: "Schema" ба ҷои "Shcema
         return values
 
 
-class AddUserSchema(BaseModel):  # ✅ Ислоҳ: "Schema" ба ҷои "Shcema"
+class AddUserSchema(BaseModel):  
     username: str
     password: str
     confirm_password: str
@@ -46,7 +46,7 @@ class AddUserSchema(BaseModel):  # ✅ Ислоҳ: "Schema" ба ҷои "Shcema"
         return values
 
 
-class LoginSchema(BaseModel):  # ✅ Ислоҳ: "Schema" ба ҷои "Shcema"
+class LoginSchema(BaseModel):  
     username: str
     password: str
     
@@ -122,7 +122,7 @@ class SetRoleToUserSchema(BaseModel):
         return value
 
 
-# ==================== MEDICAL SYSTEM SCHEMAS ====================
+
 
 class PatientCreateSchema(BaseModel):
     first_name: str
@@ -168,7 +168,7 @@ class DoctorCreateSchema(BaseModel):
 
 class DoctorSchema(DoctorCreateSchema):
     id: int
-    user_id: Optional[int] = None   # ✅ ислоҳ
+    user_id: Optional[int] = None   
     is_available: bool
     hospital_name: Optional[str] = None
     department_name: Optional[str] = None
@@ -185,7 +185,7 @@ class AppointmentCreateSchema(BaseModel):
     doctor_id: int
     hospital_id: int
     appointment_date: date
-    appointment_time: time   # ✅ на str
+    appointment_time: time  
     status: Optional[str] = "scheduled"
     symptoms: Optional[str] = None
     notes: Optional[str] = None
@@ -196,14 +196,14 @@ class AppointmentSchema(AppointmentCreateSchema):
     status: str
     notes: Optional[str] = None
     created_at: datetime
-    patient_name: Optional[str] = None  # ✅ Илова кардан
-    doctor_name: Optional[str] = None  # ✅ Илова кардан
-    hospital_name: Optional[str] = None  # ✅ Илова кардан
+    patient_name: Optional[str] = None 
+    doctor_name: Optional[str] = None  
+    hospital_name: Optional[str] = None 
     
     model_config = ConfigDict(from_attributes=True)
 
 
-# ==================== HOSPITAL SYSTEM SCHEMAS ====================
+
 
 class HospitalCreateSchema(BaseModel):
     name: str
@@ -241,9 +241,9 @@ class DepartmentSchema(DepartmentCreateSchema):
 
 class DoctorScheduleCreateSchema(BaseModel):
     doctor_id: int
-    day_of_week: int  # 0-6
-    start_time: str  # "09:00"
-    end_time: str    # "17:00"
+    day_of_week: int  
+    start_time: str  
+    end_time: str    
     slot_duration: int = 30
 
 
@@ -254,7 +254,7 @@ class DoctorScheduleSchema(DoctorScheduleCreateSchema):
     model_config = ConfigDict(from_attributes=True)
 
 
-# Forward references for recursive schemas
+
 PermissionSchema.model_rebuild()
 RoleSchema.model_rebuild()
 
